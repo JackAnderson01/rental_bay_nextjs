@@ -7,6 +7,7 @@ export const GlobalContextProvider = ({ children }) => {
 
     const cartRef = useRef(null);
     const filterRef = useRef(null);
+    const baseUrl = "https://c06e-103-138-50-154.ngrok-free.app/api"
 
     const toggleCart = () => {
         // Check if the cartRef.current is not null before accessing its classList
@@ -26,8 +27,15 @@ export const GlobalContextProvider = ({ children }) => {
         }
     }
 
+
+
+    // Global states or error handling:
+    const [formError, setFormError] = useState(false);
+    const [emailError, setEmailError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
+
     return (
-        <GlobalContext.Provider value={{ cartRef, toggleCart, filterRef, toggleFilter }}>
+        <GlobalContext.Provider value={{ cartRef, toggleCart, filterRef, toggleFilter, formError, setFormError, emailError, setEmailError, passwordError, setPasswordError, baseUrl }}>
             <div>
                 {children}
             </div>
