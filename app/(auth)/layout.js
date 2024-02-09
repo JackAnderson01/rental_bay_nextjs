@@ -1,7 +1,10 @@
+
 import Footer from "@/components/global/Footer";
 import AuthNavbar from "@/components/auth/AuthNavbar";
 
 export default function AuthLayout({ children }) {
+
+
     return (
         <div className="w-full h-auto  overflow-x-hidden flex flex-col justify-start items-start relative">
 
