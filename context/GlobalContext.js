@@ -34,8 +34,12 @@ export const GlobalContextProvider = ({ children }) => {
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
 
+    // Authentication states:
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+
     return (
-        <GlobalContext.Provider value={{ cartRef, toggleCart, filterRef, toggleFilter, formError, setFormError, emailError, setEmailError, passwordError, setPasswordError, baseUrl }}>
+        <GlobalContext.Provider value={{ cartRef, toggleCart, filterRef, toggleFilter, formError, setFormError, emailError, setEmailError, passwordError, setPasswordError, baseUrl, isLoggedIn, setIsLoggedIn }}>
             <div>
                 {children}
             </div>
