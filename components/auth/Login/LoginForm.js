@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import AuthButton from "@/components/auth/AuthButton";
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
@@ -8,10 +8,14 @@ import AuthInput from '../AuthInput';
 import { HiOutlineMail } from "react-icons/hi";
 import { MdOutlineLock } from "react-icons/md";
 import SocialLogins from '../SocialLogins';
+import axios from "axios";
+import { GlobalContext } from '@/context/GlobalContext';
+import FormError from '@/components/global/FormError';
 
 
 const LoginForm = () => {
 
+    const { formError, setFormError, emailError, passwordError, setEmailError, setPasswordError, baseUrl } = useContext(GlobalContext)
 
     const router = useRouter();
 
@@ -25,13 +29,38 @@ const LoginForm = () => {
 
 
     const handleLogin = () => {
-        // Other functionalities
-        console.log("Loggedin");
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false)
-            router.push("/home")
-        }, 2000)
+        if (email == "") {
+            setEmailError("Email is required.");
+            setTimeout(() => {
+                setEmailError(false);
+            }, 3000)
+        } else if (password == "") {
+            setPasswordError("Password is required.");
+            setTimeout(() => {
+                setPasswordError(false);
+            }, 3000)
+        } else {
+            setLoading(true)
+            axios
+                .post(`${baseUrl}/login-email`, {
+                    email: email,
+                    password: password,
+                })
+                .then(
+                    (response) => {
+                        localStorage.setItem("token", response?.data?.data?.token);
+                        if (response?.data?.data?.token) {
+                            router.push("/home/");
+                        }
+                        setLoading(false);
+                    },
+                    (error) => {
+                        setLoading(false);
+                        setFormError(error?.response?.data?.error)
+                    }
+                );
+        }
+
     }
 
     return (
@@ -47,9 +76,22 @@ const LoginForm = () => {
 
             </div>
 
+
             <div className="w-full h-auto mt-0 lg:mt-8 mb-4 flex flex-col  justify-start items-start">
-                <AuthInput text={"Email Address"} icon={<HiOutlineMail />} state={email} setState={setEmail} type={"email"}/>
-                <AuthInput text={"Password"} icon={<MdOutlineLock />} state={password} setState={setPassword} type={"password"} />
+                {formError && <FormError />}
+                <div className='w-full h-auto flex flex-col gap-[2px]'>
+                    <AuthInput text={"Email Address"} icon={<HiOutlineMail />} state={email} setState={setEmail} type={"email"} />
+                    {
+                        emailError && <label className='ml-3 text-xs font-medium capitalize text-red-500'>{emailError}</label>
+                    }
+                </div>
+                <div className='w-full h-auto flex flex-col gap-[2px]'>
+
+                    <AuthInput text={"Password"} icon={<MdOutlineLock />} state={password} setState={setPassword} type={"password"} />
+                    {
+                        passwordError && <label className='ml-3 text-xs font-medium capitalize text-red-500'>{passwordError}</label>
+                    }
+                </div>
                 <div className='w-full h-auto mt-1 flex justify-end items-center'>
                     <Link href="/verify-email" className='text-xs font-semibold text-blue-500'>
                         Forgot Password?

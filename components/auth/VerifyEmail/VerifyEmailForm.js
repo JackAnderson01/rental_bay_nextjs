@@ -1,17 +1,21 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
+import { GlobalContext } from '@/context/GlobalContext';
 import AuthButton from "@/components/auth/AuthButton";
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import AuthInput from '../AuthInput';
 import { HiOutlineMail } from "react-icons/hi";
 import { MdOutlineLock } from "react-icons/md";
+import axios from 'axios';
+import FormError from '@/components/global/FormError';
 
 const VerifyEmailForm = () => {
 
+  const { formError, setFormError, emailError, passwordError, setEmailError, setPasswordError, baseUrl } = useContext(GlobalContext)
 
-  
+
   const router = useRouter();
 
   const [loading, setLoading] = useState(false)
@@ -20,16 +24,32 @@ const VerifyEmailForm = () => {
   // Form Input States:
   const [email, setEmail] = useState("");
 
-
-
   const handleEmailVerification = () => {
-      // Other functionalities
-      console.log("EmailVerified");
-      setLoading(true);
+    if (email == "") {
+      setEmailError("*Email is required.");
       setTimeout(() => {
-          setLoading(false)
-          router.push("/verify-otp")
-      }, 2000)
+        setEmailError(false);
+      }, 3000)
+    } else {
+      setLoading(true)
+      axios
+        .post(`${baseUrl}/forget-password`, {
+          email: email,
+        })
+        .then(
+          (response) => {
+            console.log(response);
+            router.push("/verify-otp/")
+            setLoading(false);
+          },
+          (error) => {
+            setLoading(false);
+            console.log(error)
+            setFormError(error?.response?.data?.error?.email[0])
+          }
+        );
+    }
+
   }
 
   return (
@@ -37,7 +57,7 @@ const VerifyEmailForm = () => {
 
       <div className="w-full h-auto flex flex-col gap-2 justify-start items-start">
         <h1 className="text-gray-900 text-2xl lg:text-3xl font-bold">
-        Forgot Password!
+          Forgot Password!
         </h1>
         <span className="text-sm lg:text-lg text-[#959595] font-medium">
           Enter your registered email
@@ -45,8 +65,15 @@ const VerifyEmailForm = () => {
 
       </div>
 
+      {formError && <FormError />}
+
       <div className="w-full h-auto mt-0 lg:mt-8 mb-4 flex flex-col  justify-start items-start">
-        <AuthInput text={"Email Address"} icon={<HiOutlineMail />} state={email} setState={setEmail} type={"email"} />
+        <div className='w-full h-auto flex flex-col gap-[2px]'>
+          <AuthInput text={"Email Address"} icon={<HiOutlineMail />} state={email} setState={setEmail} type={"email"} />
+          {
+            emailError && <label className='ml-3 text-xs font-medium capitalize text-red-500'>{emailError}</label>
+          }
+        </div>
         <AuthButton onClick={handleEmailVerification} text={"Next"} loading={loading} />
       </div>
 

@@ -12,7 +12,7 @@ import FormError from '@/components/global/FormError'
 
 
 
-const VerifyOtpForm = () => {
+const VerifyEmailOtp = () => {
 
 
     const router = useRouter();
@@ -56,7 +56,7 @@ const VerifyOtpForm = () => {
                         console.log(response);
                         // just for now
                         localStorage.setItem("otp", otp)
-                        router.push("/change-password/")
+                        router.push("/login/")
                         setLoading(false);
                     },
                     (error) => {
@@ -110,4 +110,4 @@ const VerifyOtpForm = () => {
     )
 }
 
-export default VerifyOtpForm
+export default VerifyEmailOtp
