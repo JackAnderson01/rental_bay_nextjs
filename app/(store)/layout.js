@@ -8,8 +8,8 @@ import AuthenticatoinRequired from "@/pages/AuthenticatoinRequired";
 import { useContext, useEffect, useState } from "react";
 
 export default function StoreLayout({ children }) {
-    const {isLoggedIn} = useContext(GlobalContext)
-    
+    const {isLoggedIn} = useContext(GlobalContext);
+
     return (
         isLoggedIn ?
         <main className="w-full min-h-screen h-auto flex flex-col justify-start items-start relative" >

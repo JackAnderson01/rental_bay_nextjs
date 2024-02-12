@@ -8,12 +8,14 @@ import {
 } from "firebase/auth";
 import { GlobalContext } from '@/context/GlobalContext';
 import axios from 'axios';
-
+import { useRouter } from 'next/navigation';
 
 
 const SocialLogins = () => {
 
     const { setFormError, baseUrl } = useContext(GlobalContext)
+
+    const router = useRouter()
 
 
     const handleAppleLogin = async () => {
@@ -50,8 +52,10 @@ const SocialLogins = () => {
     const handleGoogleLogin = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
+            console.log(auth)
             if (result) {
-                const token = await result?.user?.getIdToken();
+                // const token = await result?.user?.getIdToken();
+                const token = await auth.currentUser.getIdToken(true)
                 if (token) {
                     axios
                         .post(`${baseUrl}/login-social`, {
@@ -59,14 +63,52 @@ const SocialLogins = () => {
                         })
                         .then(
                             (response) => {
-                                // localStorage.setItem("token", response?.data?.data?.token);
-                                console.log(response)
+                                // just for now
+                                localStorage.setItem("token", response?.data?.data?.token);
                                 if (response?.data?.data?.token) {
                                     router.push("/home/");
                                 }
                             },
                             (error) => {
                                 // setFormError(error?.response?.data?.error)
+                                if (error?.response?.data?.error == "No user found") {
+                                    axios
+                                        .post(`${baseUrl}/register-social`, {
+                                            id_token: token
+                                        })
+                                        .then(
+                                            (response) => {
+                                                console.log(response)
+                                                if (response?.status == 201) {
+                                                    axios
+                                                        .post(`${baseUrl}/login-social`, {
+                                                            id_token: token
+                                                        })
+                                                        .then(
+                                                            (response) => {
+                                                                // just for now
+                                                                localStorage.setItem("token", response?.data?.data?.token);
+                                                                console.log(response)
+                                                                if (response?.data?.data?.token) {
+                                                                    router.push("/home/");
+                                                                }
+                                                            },
+                                                            (error) => {
+                                                                setFormError(error?.response?.data?.error)
+                                                                console.log(error)
+                                                            }
+                                                        );
+                                                    if (response?.data?.data?.token) {
+                                                        router.push("/home/");
+                                                    }
+                                                }
+                                            },
+                                            (error) => {
+                                                setFormError(error?.response?.data?.error)
+                                                console.log(error)
+                                            }
+                                        );
+                                }
                                 console.log(error)
                             }
                         );

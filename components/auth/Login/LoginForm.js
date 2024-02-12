@@ -39,7 +39,13 @@ const LoginForm = () => {
             setTimeout(() => {
                 setPasswordError(false);
             }, 3000)
-        } else {
+        } else if (password.length < 6 ) {
+            setPasswordError("Minimum password length is 6.");
+            setTimeout(() => {
+                setPasswordError(false);
+            }, 3000)
+        }
+         else {
             setLoading(true)
             axios
                 .post(`${baseUrl}/login-email`, {

@@ -45,7 +45,7 @@ const VerifyEmailForm = () => {
           (error) => {
             setLoading(false);
             console.log(error)
-            setFormError(error?.response?.data?.error?.email[0])
+            setFormError(error?.response?.data?.error)
           }
         );
     }
